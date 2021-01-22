@@ -5,8 +5,8 @@ let mongoose = require('mongoose');
 let postSchema = mongoose.Schema({
   title: {type: String, required: true},
   body: {type: String, required: true},
-  createAt: {type: Date, default: Date.now},
-  updateAt: {type: Date},
+  createdAt: {type: Date, default: Date.now},
+  updatedAt: {type: Date},
 });
 
 // model & export

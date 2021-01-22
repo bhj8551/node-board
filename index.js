@@ -30,7 +30,6 @@ db.on('error', err => {
 // Other settings
 app.set('view engine', 'ejs');
 app.use(express.static(__dirname+'/public'));
-
 // json 형식의 데이터를 받는다
 // form에 입력한 데이터가 bodyParser를 통해 req.body로 생성된다.
 app.use(bodyParser.json());

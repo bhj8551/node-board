@@ -45,7 +45,7 @@ router.get('/:id/edit', (req, res) => {
 
 // update
 router.put('/:id', (req, res) => {
-  req.body.updateAt = Date.now();
+  req.body.updatedAt = Date.now();
   Post.findOneAndUpdate({_id:req.params.id}, req.body, (err, post) => {
     if(err) return res.json(err);
     res.redirect('/posts/'+req.params.id);
