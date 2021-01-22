@@ -42,6 +42,7 @@ app.use(methodOverride('_method'));
 
 // route 설정
 app.use('/', require('./routes/home'));
+app.use('/posts', require('./routes/posts'));
 
 
 
