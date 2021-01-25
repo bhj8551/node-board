@@ -5,6 +5,8 @@ let express = require('express');
 let mongoose = require('mongoose');
 let bodyParser = require('body-parser');
 let methodOverride = require('method-override');
+let flash = require('connect-flash');
+let session = require('express-session');
 let app = express();
 
 // DB setting 거의 고정
@@ -36,6 +38,10 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended:true}));
 // _method의 query로 들어오는 값으로 HTTP method를 바꾼다.
 app.use(methodOverride('_method'));
+// 이제 req.flash 사용 가능
+// req.flash(문자열, 저장할_값)
+app.use(flash());
+app.use(session({secret:'MySecret', resave:true, saveUninitialized:true}));
 
 
 
