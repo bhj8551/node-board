@@ -3,6 +3,7 @@
 let express = require('express');
 let router = express.Router();
 let Post = require('../models/Post');
+let util = require('../util');
 
 // index
 router.get('/', (req, res) => {
@@ -16,13 +17,19 @@ router.get('/', (req, res) => {
 
 // New
 router.get('/new', (req, res) => {
-  res.render('posts/new');
+  let post = req.flash('post')[0] || {};
+  let errors = req.flash('errors')[0] || {};
+  res.render('posts/new', { post:post, errors:errors });
 });
 
 // create
 router.post('/', (req, res) => {
   Post.create(req.body, (err, post) => {
-    if(err) return res.json(err);
+    if(err) {
+      req.flash('post', req.body);
+      req.flash('errors', util.parseError(err));
+      return res.redirect('/posts/new');
+    }
     res.redirect('/posts');
   });
 });
@@ -37,17 +44,29 @@ router.get('/:id', (req, res) => {
 
 // edit
 router.get('/:id/edit', (req, res) => {
-  Post.findOne({_id:req.params.id}, (err, post) => {
-    if(err) return res.json(err);
-    res.render('posts/edit', {post:post});
-  });
-})
+  let post = req.flash('post')[0];
+  let errors = req.flash('errors')[0] || {};
+  if(!post){
+    Post.findOne({_id:req.params.id}, (err, post) => {
+      if(err) return res.json(err);
+      res.render('posts/edit', {post:post, errors:errors});
+    });
+  }
+  else {
+    post._id = req.params.id;
+    res.render('posts/edit', {post:post, errors:errors});
+  }
+});
 
 // update
 router.put('/:id', (req, res) => {
   req.body.updatedAt = Date.now();
-  Post.findOneAndUpdate({_id:req.params.id}, req.body, (err, post) => {
-    if(err) return res.json(err);
+  Post.findOneAndUpdate({_id:req.params.id}, req.body, {runValidators:true}, (err, post) => {
+    if(err) {
+      req.flash('post', req.body);
+      req.flash('errors', util.parseError(err));
+      return res.redirect('/posts/'+req.params.id+'/edit');
+    }
     res.redirect('/posts/'+req.params.id);
   });
 });

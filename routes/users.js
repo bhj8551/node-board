@@ -2,6 +2,7 @@
 let express = require('express');
 let router = express.Router();
 let User = require('../models/User');
+let util = require('../util');
 
 // index
 router.get('/', (req, res) => {
@@ -26,7 +27,7 @@ router.post('/', (req, res) => {
     // user 생성 시 오류가 있으면 user, error flash를 만들고 new페이지로 redirect
     if(err){
       req.flash('user', req.body);
-      req.flash('errors', parseError(err));
+      req.flash('errors', util.parseError(err));
       return res.redirect('/users/new');
     }
     res.redirect('/');
@@ -75,7 +76,7 @@ router.put('/:username', (req, res, next) => {
       if(err)
       {
         req.flash('user', req.body);
-        req.flash('errors', parseError(err));
+        req.flash('errors', util.parseError(err));
         return res.redirect('/users/'+req.params.username+'/edit');
       }
       res.redirect('/users/'+user.username);
@@ -91,23 +92,5 @@ router.delete('/:username', (req, res) => {
   });
 });
 
-// functions
-let parseError = errors => {
-  console.log("errors: ", errors);
-  let parsed = {};
-  if(errors.name == 'ValidationError'){
-    for(let name in errors.errors){
-      let validationError = errors.errors[name];
-      parsed[name] = {message:validationError.message};
-    }
-  }
-  else if(errors.code == '11000' && errors.errmsg.indexOf('username') > 0) {
-    parsed.username = { message:'This username already exists!' };
-  }
-  else {
-    parsed.unhandled = JSON.stringify(errors);
-  }
-  return parsed;
-}
 
 module.exports = router;
