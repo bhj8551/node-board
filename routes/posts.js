@@ -8,6 +8,8 @@ let util = require('../util');
 // index
 router.get('/', (req, res) => {
   Post.find({})
+  // user의 값을 author에 생성
+  .populate('author')
   .sort('-createdAt')
   .exec((err, posts) => {
     if(err) return res.json(err);
@@ -24,6 +26,8 @@ router.get('/new', (req, res) => {
 
 // create
 router.post('/', (req, res) => {
+  // 로그인을 하면 passport에서 자동으로 생성해주는 req.user
+  req.body.author = req.user._id;
   Post.create(req.body, (err, post) => {
     if(err) {
       req.flash('post', req.body);
@@ -36,10 +40,12 @@ router.post('/', (req, res) => {
 
 // show
 router.get('/:id', (req, res) => {
-  Post.findOne({_id:req.params.id}, (err, post) => {
-    if(err) return res.json(err);
-    res.render('posts/show', {post:post});
-  });
+  Post.findOne({_id:req.params.id})
+    .populate('author')
+    .exec((err, post) => {
+      if(err) return res.json(err);
+      res.render('posts/show', {post:post});
+    });
 });
 
 // edit
